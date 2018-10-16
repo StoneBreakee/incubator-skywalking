@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
 import org.apache.skywalking.apm.agent.core.boot.AgentPackageNotFoundException;
 import org.apache.skywalking.apm.agent.core.boot.AgentPackagePath;
 import org.apache.skywalking.apm.agent.core.logging.api.ILog;
@@ -41,6 +42,12 @@ import org.apache.skywalking.apm.agent.core.plugin.PluginBootstrap;
 /**
  * The <code>AgentClassLoader</code> represents a classloader,
  * which is in charge of finding plugins and interceptors.
+ * <p>
+ * Java核心卷II Chapter9 1.4
+ * 编写自己的类加载器,继承ClassLoader类,然后覆盖findClass(String className)
+ * 执行机制:父类ClassLoader的loadClass方法用于将类的加载操作委托给其父类加载器去进行,只有当该类尚未加载
+ * 并且父类加载器也无法加载该类时,才调用findClass方法,最后调用父类CLassLoader的defineCLass方法,向虚拟机提供字节码
+ * 用途:为来自本地文件系统或者其他来源的类加载其字节码
  *
  * @author wusheng
  */
@@ -48,6 +55,7 @@ public class AgentClassLoader extends ClassLoader {
     private static final ILog logger = LogManager.getLogger(AgentClassLoader.class);
     /**
      * The default class loader for the agent.
+     * 单例模式
      */
     private static AgentClassLoader DEFAULT_LOADER;
 
@@ -79,6 +87,7 @@ public class AgentClassLoader extends ClassLoader {
     public AgentClassLoader(ClassLoader parent) throws AgentPackageNotFoundException {
         super(parent);
         File agentDictionary = AgentPackagePath.getPath();
+        // 将打包之后的两个插件目录,放入列表中
         classpath = new LinkedList<File>();
         classpath.add(new File(agentDictionary, "plugins"));
         classpath.add(new File(agentDictionary, "activations"));
@@ -116,6 +125,7 @@ public class AgentClassLoader extends ClassLoader {
                             } catch (IOException ignored) {
                             }
                     }
+                    // 调用父类ClassLoader的defineClass方法,向虚拟机提供字节码
                     return defineClass(name, data, 0, data.length);
                 } catch (MalformedURLException e) {
                     logger.error(e, "find class fail.");

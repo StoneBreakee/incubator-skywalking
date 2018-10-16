@@ -61,8 +61,13 @@ public class SkyWalkingAgent {
     public static void premain(String agentArgs, Instrumentation instrumentation) throws PluginException {
         final PluginFinder pluginFinder;
         try {
+            // 初始化项目中的配置,配置类信息保存在apm-agent-core/.../conf/Config.java
             SnifferConfigInitializer.initialize();
 
+            // 定位插件，并将插件的jar包文件保存为File，由List进行存储
+            // PluginBootstrap
+            //      loadPlugins()
+            // PluginFinder(List<AbstractClassEnhancePluginDefine> plugins)
             pluginFinder = new PluginFinder(new PluginBootstrap().loadPlugins());
 
         } catch (Exception e) {

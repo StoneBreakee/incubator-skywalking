@@ -27,6 +27,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
+ * AgentPackagePath 主要用于定位skywalking-agent.jar所在的目录位置,也即路径
+ * 并根据该路径获取插件的目录路径,将插件扫描后,保存在内存列表中
+ * 完整路径为 F:\intellij_hadoop\incubator-skywalking\skywalking-agent\skywalking-agent.jar
+ * URL为 jar:file:\\F:\intellij_hadoop\incubator-skywalking\skywalking-agent\skywalking-agent.jar!\... ...\AgentPackagePath
+ *
  * @author wusheng
  */
 public class AgentPackagePath {
@@ -45,6 +50,8 @@ public class AgentPackagePath {
         return AGENT_PACKAGE_PATH != null;
     }
 
+    // 返回的File为 new File("F:\intellij_hadoop\incubator-skywalking\skywalking-agent\")
+    // 即为skywalking-agent.jar 的父目录
     private static File findPath() throws AgentPackageNotFoundException {
         String classResourcePath = AgentPackagePath.class.getName().replaceAll("\\.", "/") + ".class";
 
